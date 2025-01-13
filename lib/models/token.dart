@@ -1,0 +1,37 @@
+class Token {
+  final String name;
+  final String abbreviation;
+  final double price;
+  final String icon;
+  final double amount;
+
+  Token({
+    required this.name,
+    required this.abbreviation,
+    required this.price,
+    required this.icon,
+    required this.amount,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'abbreviation': abbreviation,
+      'price': price,
+      'icon': icon,
+      'amount': amount,
+    };
+  }
+
+  factory Token.fromMap(Map<String, dynamic> map) {
+    return Token(
+      name: map['name'] ?? '',
+      abbreviation: map['abbreviation'] ?? '',
+      price: (map['price'] ?? 0.0).toDouble(),
+      icon: map['icon'] ?? '',
+      amount: (map['amount'] ?? 0.0).toDouble(),
+    );
+  }
+
+  get symbol => null;
+}

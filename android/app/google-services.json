@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "492169211395",
+    "project_id": "bitwal-app",
+    "storage_bucket": "bitwal-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:492169211395:android:1093265042460eb7a62836",
+        "android_client_info": {
+          "package_name": "com.example.bitwal_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAJMWCuoKrWmU-YnDHoxVlIfeh-1u2_nh4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
