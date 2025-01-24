@@ -114,7 +114,7 @@ class _MoreState extends State<More> {
                   label: 'Market Analysis',
                   iconSize: 50,
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const MarketsPage()));
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => MarketsPage()));
                   }
                 ),
                 IconActionWidget(

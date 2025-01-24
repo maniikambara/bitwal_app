@@ -1,8 +1,11 @@
+import 'package:bitwal_app/pages/security.dart';
+import 'package:bitwal_app/widgets/helps_feedback.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:bitwal_app/services/auth_service.dart';
 import 'package:bitwal_app/pages/login.dart';
 import 'package:bitwal_app/models/user.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -48,6 +51,15 @@ class SettingsPage extends StatelessWidget {
           SnackBar(content: Text(e.toString())),
         );
       }
+    }
+  }
+
+  Future<void> _launchURL(String url) async {
+    final Uri uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      throw 'Could not launch $url';
     }
   }
 
@@ -100,6 +112,7 @@ class SettingsPage extends StatelessWidget {
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
                               ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                             Text(
                               user.username,
@@ -107,6 +120,7 @@ class SettingsPage extends StatelessWidget {
                                 color: Colors.grey,
                                 fontSize: 16,
                               ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ],
                         ),
@@ -118,21 +132,51 @@ class SettingsPage extends StatelessWidget {
                       context,
                       'Language',
                       'English',
-                      () => _showOptionsDialog(context, 'Language', ['Indonesia', 'English', 'Ngak tau']),
+                      () => _showOptionsDialog(context, 'Language', ['English', 'Indonesia (Coming Soon)']),
                     ),
                     _buildSettingsTile(
                       context,
                       'Currency',
-                      'USD',
-                      () => _showOptionsDialog(context, 'Currency', ['USD', 'IDR', 'YEN']),
+                      'IDR',
+                      () => _showOptionsDialog(context, 'Currency', ['IDR', 'USD (Coming Soon)']),
                     ),
-                    _buildSettingsTile(context, 'Theme', 'System', () {}),
-                    _buildSettingsTile(context, 'Reporting cycle', 'Local time', () {}),
+                    _buildSettingsTile(context, 'Theme', 'System (Dark)', () {}),
+                    _buildSettingsTile(
+                      context,
+                      'Reporting cycle',
+                      'Local time',
+                      () => _showOptionsDialog(context, 'Reporting cycle', ['Local time', 'UTC', 'GMT']),
+                    ),
                     const SizedBox(height: 24),
                     _buildSectionTitle('Study'),
-                    _buildSettingsTile(context, 'Academy', '', () {}),
-                    _buildSettingsTile(context, 'User Feedback', '', () {}),
-                    _buildSettingsTile(context, 'Security and Privacy', '', () {}),
+                    _buildSettingsTile(
+                      context,
+                      'Academy',
+                      '',
+                      () => _launchURL('https://www.instagram.com/akademicryptocom'),
+                    ),
+                    _buildSettingsTile(
+                      context,
+                      'User Feedback',
+                      '',
+                      () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const UserFeedbackPage()),
+                        );
+                      },
+                    ),
+                    _buildSettingsTile(
+                      context,
+                      'Security and Privacy',
+                      '',
+                      () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const SecurityPage()),
+                        );
+                      },
+                    ),
                   ],
                 ),
               ),
@@ -157,6 +201,7 @@ class SettingsPage extends StatelessWidget {
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ),
@@ -174,6 +219,7 @@ class SettingsPage extends StatelessWidget {
       child: Text(
         title,
         style: const TextStyle(color: Colors.white70, fontSize: 14),
+        overflow: TextOverflow.ellipsis,
       ),
     );
   }
@@ -186,11 +232,13 @@ class SettingsPage extends StatelessWidget {
           title: Text(
             title,
             style: const TextStyle(color: Colors.white, fontSize: 16),
+            overflow: TextOverflow.ellipsis,
           ),
           subtitle: subtitle.isNotEmpty
               ? Text(
                   subtitle,
                   style: const TextStyle(color: Colors.white70, fontSize: 14),
+                  overflow: TextOverflow.ellipsis,
                 )
               : null,
           trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 16),
@@ -217,12 +265,17 @@ class SettingsPage extends StatelessWidget {
               child: Text(
                 title,
                 style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
             const Divider(color: Colors.grey),
             ...options.map(
               (option) => ListTile(
-                title: Text(option, style: const TextStyle(color: Colors.white, fontSize: 16)),
+                title: Text(
+                  option,
+                  style: const TextStyle(color: Colors.white, fontSize: 16),
+                  overflow: TextOverflow.ellipsis,
+                ),
                 onTap: () {
                   // Update selected option
                   Navigator.pop(context);

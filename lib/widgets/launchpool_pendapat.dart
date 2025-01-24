@@ -17,7 +17,7 @@ class LaunchpoolEarningsPage extends StatelessWidget {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: const Text(
-          'Pendapatan Akun',
+          'Account Earnings',
           style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
         ),
       ),
@@ -41,7 +41,7 @@ class LaunchpoolEarningsPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: const [
                     Text(
-                      'Total Saldo 👁',
+                      'Total Balance 👁',
                       style: TextStyle(color: Colors.white70, fontSize: 16),
                     ),
                     SizedBox(height: 8),
@@ -67,8 +67,8 @@ class LaunchpoolEarningsPage extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 24),
-              _buildInfoRow('Perkiraan value', '10,201.00 BTC', 'Rp. 165,415,335'),
-              _buildInfoRow('Profit 1 Jam', '101.00 BTC', 'Rp. 1,637,775'),
+              _buildInfoRow('Estimated value', '10,201.00 BTC', 'Rp. 165,415,335'),
+              _buildInfoRow('Profit 1 Hour', '101.00 BTC', 'Rp. 1,637,775'),
               _buildInfoRow('Total profit', '10,201.00 BTC', 'Rp. 165,415,335'),
               const SizedBox(height: 32),
               SizedBox(
@@ -78,13 +78,13 @@ class LaunchpoolEarningsPage extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => VerifikasiPage(
-                      type: '',
-                      token: '',
-                      amount: 0,
-                      recipientId: '',
-                      memo: '',
-                      timestamp: DateTime.now(),
-                    ),),
+                        type: '',
+                        token: '',
+                        amount: 0,
+                        recipientId: '',
+                        memo: '',
+                        timestamp: DateTime.now(),
+                      ),),
                     );
                   },
                   style: ElevatedButton.styleFrom(

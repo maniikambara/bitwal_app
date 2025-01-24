@@ -13,6 +13,8 @@ import 'package:bitwal_app/services/auth_service.dart';
 import 'package:bitwal_app/models/user.dart';
 import 'package:bitwal_app/models/token.dart';
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -23,6 +25,10 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   bool _isBalanceVisible = true;
+  List<Map<String, String>> newsArticles = []; // List to hold the fetched news articles
+
+  // Constant for color
+  static const Color backgroundColor = Color(0xFF393E46);
 
   void _toggleBalanceVisibility() {
     setState(() {
@@ -39,6 +45,43 @@ class _HomeState extends State<Home> {
     return formatCurrency.format(amount);
   }
 
+  // Fetch news from NewsAPI
+  Future<void> fetchNews() async {
+    final url = 'https://newsapi.org/v2/everything?q=crypto&apiKey=f709e2ffa117411cb17fb91a17f785a8'; // Use your NewsAPI key
+
+    try {
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        // Safely handle dynamic types and convert them to the correct map type
+        setState(() {
+          newsArticles = List<Map<String, String>>.from(
+            data['articles'].map<Map<String, String>>((article) {
+              return {
+                'author': article['author'] ?? 'Unknown',
+                'title': article['title'] ?? 'No title',
+                'content': article['content'] ?? 'No content available',
+                'url': article['url'] ?? '',
+              };
+            }).toList(),
+          );
+        });
+      } else {
+        throw Exception('Failed to load news');
+      }
+    } catch (e) {
+      print('Error fetching news: $e');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchNews();  // Fetch news when the widget is initialized
+  }
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<UserModel?>(
@@ -46,14 +89,14 @@ class _HomeState extends State<Home> {
       builder: (context, userSnapshot) {
         if (userSnapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
-            backgroundColor: Color(0xFF393E46),
+            backgroundColor: backgroundColor,
             body: Center(child: CircularProgressIndicator()),
           );
         }
 
         if (userSnapshot.hasError) {
           return Scaffold(
-            backgroundColor: Color(0xFF393E46),
+            backgroundColor: backgroundColor,
             body: Center(
               child: Text(
                 'Error loading user data: ${userSnapshot.error}',
@@ -66,21 +109,14 @@ class _HomeState extends State<Home> {
         final user = userSnapshot.data;
         if (user == null) {
           return Scaffold(
-            backgroundColor: Color(0xFF393E46),
+            backgroundColor: backgroundColor,
             body: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
+                children: const [
                   Text(
                     'No user data available',
                     style: TextStyle(color: Colors.white, fontSize: 18),
-                  ),
-                  SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      // You might want to navigate to login or perform some action
-                    },
-                    child: Text('Login'),
                   ),
                 ],
               ),
@@ -93,14 +129,14 @@ class _HomeState extends State<Home> {
           builder: (context, tokensSnapshot) {
             if (tokensSnapshot.connectionState == ConnectionState.waiting) {
               return const Scaffold(
-                backgroundColor: Color(0xFF393E46),
+                backgroundColor: backgroundColor,
                 body: Center(child: CircularProgressIndicator()),
               );
             }
 
             if (tokensSnapshot.hasError) {
               return Scaffold(
-                backgroundColor: Color(0xFF393E46),
+                backgroundColor: backgroundColor,
                 body: Center(
                   child: Text(
                     'Error loading tokens: ${tokensSnapshot.error}',
@@ -112,9 +148,9 @@ class _HomeState extends State<Home> {
 
             return Scaffold(
               resizeToAvoidBottomInset: false,
-              backgroundColor: const Color(0xFF393E46),
+              backgroundColor: backgroundColor,
               appBar: AppBar(
-                backgroundColor: const Color(0xFF393E46),
+                backgroundColor: backgroundColor,
                 automaticallyImplyLeading: false,
                 title: Row(
                   children: [
@@ -206,12 +242,9 @@ class _HomeState extends State<Home> {
                           const SizedBox(width: 20),
                           Text(
                             user.username,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 20
-                            )
+                            style: const TextStyle(color: Colors.white, fontSize: 20),
                           ),
-                        ]
+                        ],
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -232,8 +265,8 @@ class _HomeState extends State<Home> {
                                     fontSize: 40,
                                     fontWeight: FontWeight.bold,
                                   ),
-                                )
-                              )
+                                ),
+                              ),
                             ),
                             if (_isBalanceVisible)
                               const Align(
@@ -244,11 +277,11 @@ class _HomeState extends State<Home> {
                                     color: Colors.green,
                                     fontSize: 16,
                                   ),
-                                )
-                              )
-                          ]
+                                ),
+                              ),
+                          ],
                         ),
-                      ]
+                      ],
                     ),
                     const SizedBox(height: 20),
                     buildIconGrid([
@@ -261,7 +294,7 @@ class _HomeState extends State<Home> {
                             context,
                             MaterialPageRoute(builder: (context) => const SendTokenPage()),
                           );
-                        }
+                        },
                       ),
                       IconActionWidget(
                         imagePath: 'lib/images/receive.png',
@@ -272,7 +305,7 @@ class _HomeState extends State<Home> {
                             context,
                             MaterialPageRoute(builder: (context) => const ReceiveTokenPage()),
                           );
-                        }
+                        },
                       ),
                       IconActionWidget(
                         imagePath: 'lib/images/buy.png',
@@ -283,7 +316,7 @@ class _HomeState extends State<Home> {
                             context,
                             MaterialPageRoute(builder: (context) => const TokenPages()),
                           );
-                        }
+                        },
                       ),
                       IconActionWidget(
                         imagePath: 'lib/images/more.png',
@@ -294,35 +327,30 @@ class _HomeState extends State<Home> {
                             context,
                             MaterialPageRoute(builder: (context) => const More()),
                           );
-                        }
+                        },
                       ),
                     ]),
                     const SizedBox(height: 20),
-                    const Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'News Today!',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold
-                        )
-                      ),
+                    Text(
+                      'Latest Crypto News',
+                      style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
                     ),
-                    const SizedBox(height: 10),
                     Expanded(
                       child: ListView.builder(
-                        itemCount: 5,
+                        itemCount: newsArticles.length,
                         itemBuilder: (context, index) {
-                          return NewsCard(
-                            author: 'Author ${index + 1}',
-                            title: 'Title ${index + 1}',
-                            content: 'Content ${index + 1}',
-                            url: '',
+                          final article = newsArticles[index];
+                          return ListTile(
+                            title: Text(article['title']!, style: const TextStyle(color: Colors.white)),
+                            subtitle: Text(article['author']!, style: const TextStyle(color: Colors.white70)),
+                            trailing: const Icon(Icons.arrow_forward, color: Colors.white),
+                            onTap: () {
+                              // Handle the article tap, e.g., navigate to the article's URL
+                            },
                           );
                         },
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),

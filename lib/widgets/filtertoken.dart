@@ -49,54 +49,54 @@ class _TokenFilterSheetState extends State<TokenFilterSheet> {
                 shrinkWrap: true,
                 children: [
                   FilterOption(
-                    title: 'Token Terbaru',
-                    isSelected: selectedFilter == 'Token Terbaru',
-                    onSelect: () => _selectFilter('Token Terbaru'),
+                    title: 'Latest Tokens',
+                    isSelected: selectedFilter == 'Latest Tokens',
+                    onSelect: () => _selectFilter('Latest Tokens'),
                   ),
                   FilterOption(
-                    title: 'Token Favorit',
-                    isSelected: selectedFilter == 'Token Favorit',
-                    onSelect: () => _selectFilter('Token Favorit'),
+                    title: 'Favorite Tokens',
+                    isSelected: selectedFilter == 'Favorite Tokens',
+                    onSelect: () => _selectFilter('Favorite Tokens'),
                   ),
                   FilterOption(
-                    title: 'Token Meme',
-                    isSelected: selectedFilter == 'Token Meme',
-                    onSelect: () => _selectFilter('Token Meme'),
+                    title: 'Meme Tokens',
+                    isSelected: selectedFilter == 'Meme Tokens',
+                    onSelect: () => _selectFilter('Meme Tokens'),
                   ),
                   FilterOption(
-                    title: 'Token Gaming',
-                    isSelected: selectedFilter == 'Token Gaming',
-                    onSelect: () => _selectFilter('Token Gaming'),
+                    title: 'Gaming Tokens',
+                    isSelected: selectedFilter == 'Gaming Tokens',
+                    onSelect: () => _selectFilter('Gaming Tokens'),
                   ),
                   FilterOption(
-                    title: 'Token AI & Big Data',
-                    isSelected: selectedFilter == 'Token AI & Big Data',
-                    onSelect: () => _selectFilter('Token AI & Big Data'),
+                    title: 'AI & Big Data Tokens',
+                    isSelected: selectedFilter == 'AI & Big Data Tokens',
+                    onSelect: () => _selectFilter('AI & Big Data Tokens'),
                   ),
                   FilterOption(
-                    title: 'Token DoFi',
-                    isSelected: selectedFilter == 'Token DoFi',
-                    onSelect: () => _selectFilter('Token DoFi'),
+                    title: 'DoFi Tokens',
+                    isSelected: selectedFilter == 'DoFi Tokens',
+                    onSelect: () => _selectFilter('DoFi Tokens'),
                   ),
                   FilterOption(
-                    title: 'Token Layer 1',
-                    isSelected: selectedFilter == 'Token Layer 1',
-                    onSelect: () => _selectFilter('Token Layer 1'),
+                    title: 'Layer 1 Tokens',
+                    isSelected: selectedFilter == 'Layer 1 Tokens',
+                    onSelect: () => _selectFilter('Layer 1 Tokens'),
                   ),
                   FilterOption(
-                    title: 'Token Layer 2',
-                    isSelected: selectedFilter == 'Token Layer 2',
-                    onSelect: () => _selectFilter('Token Layer 2'),
+                    title: 'Layer 2 Tokens',
+                    isSelected: selectedFilter == 'Layer 2 Tokens',
+                    onSelect: () => _selectFilter('Layer 2 Tokens'),
                   ),
                   FilterOption(
-                    title: 'Token NFT',
-                    isSelected: selectedFilter == 'Token NFT',
-                    onSelect: () => _selectFilter('Token NFT'),
+                    title: 'NFT Tokens',
+                    isSelected: selectedFilter == 'NFT Tokens',
+                    onSelect: () => _selectFilter('NFT Tokens'),
                   ),
                   FilterOption(
-                    title: 'Token Web3',
-                    isSelected: selectedFilter == 'Token Web3',
-                    onSelect: () => _selectFilter('Token Web3'),
+                    title: 'Web3 Tokens',
+                    isSelected: selectedFilter == 'Web3 Tokens',
+                    onSelect: () => _selectFilter('Web3 Tokens'),
                   ),
                 ],
               ),
@@ -115,7 +115,7 @@ class _TokenFilterSheetState extends State<TokenFilterSheet> {
               ),
               child: const Center(
                 child: Text(
-                  'TERAPKAN',
+                  'APPLY',
                   style: TextStyle(
                     color: Color(0xFF222831),
                     fontWeight: FontWeight.bold,
@@ -162,7 +162,7 @@ class FilterOption extends StatelessWidget {
               groupValue: isSelected,
               onChanged: (_) => onSelect(),
               activeColor: const Color(0xFFD65A31),
-              fillColor: WidgetStateProperty.resolveWith<Color>(
+              fillColor: WidgetStateProperty.resolveWith<Color>( 
                 (Set<WidgetState> states) {
                   if (states.contains(WidgetState.selected)) {
                     return const Color(0xFFD65A31);

@@ -54,7 +54,7 @@ class _QRShowPageState extends State<QRShowPage> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 const Text(
-                  'Untuk melakukan pembayaran dengan QR\nsilahkan tunjukkan kode QR ini.',
+                  'To make a payment with QR, please show this QR code.',
                   style: TextStyle(color: Colors.white54, fontSize: 16),
                   textAlign: TextAlign.center,
                 ),
@@ -131,7 +131,7 @@ class _QRShowPageState extends State<QRShowPage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                'Token : $selectedToken',
+                                'Token: $selectedToken',
                                 style: const TextStyle(color: Colors.white, fontSize: 16),
                               ),
                               const SizedBox(width: 8),

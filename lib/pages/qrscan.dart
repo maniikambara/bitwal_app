@@ -78,6 +78,7 @@ class QRScanPage extends StatelessWidget {
             if (text == "QR Show") {
               Navigator.push(context, MaterialPageRoute(builder: (context) => const QRShowPage()));
             }
+            // Add QR scan functionality here if needed
           },
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 12),
@@ -107,7 +108,7 @@ class QRScanPage extends StatelessWidget {
         ),
         child: const Center(
           child: Text(
-            'QR Scan functionality temporarily unavailable',
+            'QR Scan functionality is temporarily unavailable',
             style: TextStyle(color: Colors.white, fontSize: 16),
             textAlign: TextAlign.center,
           ),
@@ -117,14 +118,16 @@ class QRScanPage extends StatelessWidget {
   }
 
   Widget _buildGalleryButton() {
-    return const Padding(
-      padding: EdgeInsets.all(16.0),
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
       child: Align(
         alignment: Alignment.bottomRight,
         child: FloatingActionButton(
-          backgroundColor: Color(0xFF4E5967),
-          onPressed: null,
-          child: Icon(Icons.image, color: Colors.white54),
+          backgroundColor: const Color(0xFF4E5967),
+          onPressed: () {
+            // Handle gallery action (e.g., pick image from gallery)
+          },
+          child: const Icon(Icons.image, color: Colors.white54),
         ),
       ),
     );

@@ -1,6 +1,8 @@
 import 'package:bitwal_app/pages/notif.dart';
 import 'package:bitwal_app/pages/send.dart';
 import 'package:bitwal_app/widgets/receivedetail.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -14,14 +16,36 @@ class ReceiveTokenPage extends StatefulWidget {
 class _ReceiveTokenPageState extends State<ReceiveTokenPage> {
   String selectedRange = '1 Hari';
   final currencyFormat = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
+  List<Map<String, dynamic>> userTokens = [];
 
-  final List<Map<String, dynamic>> userTokens = [
-    {'name': 'BTC', 'fullName': 'Bitcoin', 'amount': 0.5, 'price': 450000000},
-    {'name': 'ETH', 'fullName': 'Ethereum', 'amount': 2.0, 'price': 30000000},
-    {'name': 'ADA', 'fullName': 'Cardano', 'amount': 1000.0, 'price': 7500},
-    {'name': 'DOT', 'fullName': 'Polkadot', 'amount': 100.0, 'price': 150000},
-    {'name': 'XRP', 'fullName': 'Ripple', 'amount': 5000.0, 'price': 9000},
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserTokens();
+  }
+
+  // Fetch user's tokens from Firestore
+  Future<void> _fetchUserTokens() async {
+    try {
+      String currentUserId = _getCurrentUserId();
+      
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUserId)
+          .get();
+
+      if (userDoc.exists) {
+        var data = userDoc.data() as Map<String, dynamic>;
+        var tokensList = List<Map<String, dynamic>>.from(data['tokens'] ?? []);
+        
+        setState(() {
+          userTokens = tokensList;
+        });
+      }
+    } catch (e) {
+      print('Error fetching user tokens: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -234,7 +258,7 @@ class _ReceiveTokenPageState extends State<ReceiveTokenPage> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       backgroundColor: const Color(0xFF222831),
-      builder: (context) => _FilterSheet(),
+      builder: (context) => const _FilterSheet(),
     );
   }
 
@@ -259,79 +283,46 @@ class _ReceiveTokenPageState extends State<ReceiveTokenPage> {
       ),
     );
   }
+
+  String _getCurrentUserId() {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw 'No authenticated user found';
+    }
+    return user.uid;
+  }
 }
 
 class _FilterSheet extends StatelessWidget {
+  const _FilterSheet();
+
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(32.0),
+      padding: const EdgeInsets.symmetric(vertical: 20),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Center(
-            child: SizedBox(width: 100, child: Divider(thickness: 3, color: Colors.white)),
-          ),
-          const SizedBox(height: 24),
-          const Center(
-            child: Text('FILTER', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 24)),
-          ),
-          const SizedBox(height: 20),
-          Expanded(
-            child: ListView(
-              shrinkWrap: true,
-              children: const [
-                FilterOption(title: 'Token Terbaru'),
-                FilterOption(title: 'Token Favorit'),
-                FilterOption(title: 'Token Meme'),
-                FilterOption(title: 'Token Gaming'),
-                FilterOption(title: 'Token AI & Big Data'),
-                FilterOption(title: 'Token DoFi'),
-                FilterOption(title: 'Token Layer 1'),
-                FilterOption(title: 'Token Layer 2'),
-                FilterOption(title: 'Token NFT'),
-                FilterOption(title: 'Token Web3'),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFD65A31),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-              padding: const EdgeInsets.symmetric(vertical: 16),
-            ),
-            child: const Center(
-              child: Text('TERAPKAN', style: TextStyle(color: Color(0xFF222831), fontWeight: FontWeight.bold, fontSize: 24)),
-            ),
-          ),
+        children: const [
+          _FilterOption(text: 'A'),
+          _FilterOption(text: 'B'),
+          _FilterOption(text: 'C'),
         ],
       ),
     );
   }
 }
 
-class FilterOption extends StatelessWidget {
-  final String title;
-  const FilterOption({super.key, required this.title});
+class _FilterOption extends StatelessWidget {
+  final String text;
+
+  const _FilterOption({required this.text});
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        children: [
-          Radio(
-            value: title,
-            groupValue: null,
-            onChanged: (value) {},
-            activeColor: const Color(0xFFD65A31),
-          ),
-          Text(title, style: const TextStyle(color: Colors.white, fontSize: 16)),
-        ],
-      ),
+    return ListTile(
+      title: Text(text, style: const TextStyle(color: Colors.white)),
+      onTap: () {
+        Navigator.pop(context);
+      },
     );
   }
 }

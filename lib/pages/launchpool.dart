@@ -65,7 +65,7 @@ class LaunchPoolPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Proyek 1',
+            'Project 1',
             style: TextStyle(
               color: Colors.white,
               fontSize: 18,
@@ -77,7 +77,7 @@ class LaunchPoolPage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: const [
               Text(
-                'Total yang di staking (USDT)',
+                'Total Staked (USDT)',
                 style: TextStyle(color: Colors.white54, fontSize: 16),
               ),
               Text(
@@ -183,9 +183,9 @@ class LaunchPoolPage extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        _buildInfoColumn('Total Hadiah', '1,212 BTC'),
-        _buildInfoColumn('Periode Farming', '10 Hari'),
-        _buildInfoColumn('Berakhir dalam', '01 D 04 H 32 M'),
+        _buildInfoColumn('Total Reward', '1,212 BTC'),
+        _buildInfoColumn('Farming Period', '10 Days'),
+        _buildInfoColumn('Ends in', '01 D 04 H 32 M'),
       ],
     );
   }

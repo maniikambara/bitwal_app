@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-// lib/widgets/verifikasi.dart
 class VerifikasiPage extends StatelessWidget {
   final String type;
   final String token;
@@ -45,7 +44,10 @@ class VerifikasiPage extends StatelessWidget {
       backgroundColor: const Color(0xFF222831),
       appBar: AppBar(
         backgroundColor: const Color(0xFF222831),
-        title: const Text('Verification'),
+        title: const Text(
+          'Verification',
+          style: TextStyle(color: Colors.white), // Make title text white
+        ),
         centerTitle: true,
       ),
       body: Padding(
@@ -69,7 +71,13 @@ class VerifikasiPage extends StatelessWidget {
                 backgroundColor: Colors.orange[800],
                 minimumSize: const Size(double.infinity, 60),
               ),
-              child: const Text('CONFIRM TRANSACTION'),
+              child: const Text(
+                'CONFIRM TRANSACTION',
+                style: TextStyle(
+                  color: Colors.white, // Make button text white
+                  fontSize: 18, // Increase font size
+                ),
+              ),
             ),
           ],
         ),
@@ -109,7 +117,7 @@ class VerifikasiPage extends StatelessWidget {
         final senderData = senderDoc.data() ?? {};
         final recipientData = processedRecipientId == 'Myself' ? senderData : (recipientDoc.data() ?? {});
 
-        // Use a nested map for token balances to support multiple token types
+        // Ensure 'tokens' field is a map and safely extract token balances
         final senderTokens = (senderData['tokens']?[token] ?? 0.0) as double;
         final recipientTokens = (recipientData['tokens']?[token] ?? 0.0) as double;
 

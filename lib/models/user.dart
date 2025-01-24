@@ -13,6 +13,7 @@ class UserModel {
     required this.tokens,
   });
 
+  // Convert UserModel object to Map for saving to Firestore
   Map<String, dynamic> toMap() {
     return {
       'username': username,
@@ -21,15 +22,17 @@ class UserModel {
     };
   }
 
+  // Convert Map to UserModel object
   factory UserModel.fromMap(String uid, Map<String, dynamic> map) {
     return UserModel(
       uid: uid,
       username: map['username'] ?? '',
-      balance: (map['balance'] ?? 0.0).toDouble(),
+      balance: (map['balance'] as num?)?.toDouble() ?? 0.0,
+      // Ensure tokens is a list or default to an empty list if null or invalid
       tokens: (map['tokens'] as List<dynamic>?)
               ?.map((token) => Token.fromMap(token as Map<String, dynamic>))
               .toList() ??
-          [],
+          List.empty(),
     );
   }
 }

@@ -13,7 +13,7 @@ class ConvertPage extends StatefulWidget {
 
 class _ConvertPageState extends State<ConvertPage> {
   String selectedCurrency = 'ETH';
-  String selectedBalanceCurrency = 'USD';
+  String selectedBalanceCurrency = 'IDR';
   double tokenAmount = 1.0;
   double tokenPrice = 2500.10; // Example price
   double userBalance = 0.0;
@@ -126,7 +126,7 @@ class _ConvertPageState extends State<ConvertPage> {
               _buildConversionInterface(context),
               const SizedBox(height: 20),
               Text(
-                "Your Balance: \$${userBalance.toStringAsFixed(2)}",
+                "Your Balance: Rp. ${userBalance.toStringAsFixed(2)}",
                 style: const TextStyle(color: Colors.white, fontSize: 16),
               ),
               const Spacer(),
@@ -144,9 +144,9 @@ class _ConvertPageState extends State<ConvertPage> {
       children: [
         Column(
           children: [
-            _buildCurrencyContainer("Amount", selectedCurrency, "\$${(tokenAmount * tokenPrice).toStringAsFixed(2)}"),
+            _buildCurrencyContainer("Amount", selectedCurrency, "Rp. ${(tokenAmount * tokenPrice).toStringAsFixed(2)}"),
             const SizedBox(height: 10),
-            _buildCurrencyContainer("Balance", selectedBalanceCurrency, "\$${userBalance.toStringAsFixed(2)} (+0.056%)"),
+            _buildCurrencyContainer("Balance", selectedBalanceCurrency, "Rp. ${userBalance.toStringAsFixed(2)} (+0.056%)"),
           ],
         ),
         Positioned(
@@ -210,7 +210,7 @@ class _ConvertPageState extends State<ConvertPage> {
                         child: Text(value, style: const TextStyle(color: Colors.white)),
                       );
                     }).toList()
-                  : ['USD'].map((String value) {
+                  : ['IDR'].map((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
                         child: Text(value, style: const TextStyle(color: Colors.white)),
@@ -246,11 +246,21 @@ class _ConvertPageState extends State<ConvertPage> {
       width: double.infinity,
       child: ElevatedButton(
         onPressed: _purchaseToken,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.orange[800],
-          minimumSize: const Size(double.infinity, 60),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFFD65A31),
+            padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
         ),
-        child: const Text('Purchase Token', style: TextStyle(fontSize: 18)),
+        child: const Text(
+          "CONVERT",
+          style: TextStyle(
+            color: Color(0xFF393E46),
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+        ),
       ),
     );
   }

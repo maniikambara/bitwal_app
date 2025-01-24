@@ -19,6 +19,7 @@ class _SendTokenPageState extends State<SendTokenPage> {
   String memo = '';
   String selectedToken = "Select Token";
   double currentUserTokenBalance = 0;
+  String currentUserId = '';
 
   @override
   void initState() {
@@ -28,16 +29,18 @@ class _SendTokenPageState extends State<SendTokenPage> {
 
   Future<void> _fetchCurrentUserTokenBalance() async {
     try {
-      String currentUserId = getCurrentUserId();
-      
+      currentUserId = getCurrentUserId(); // Get the current user's ID
       DocumentSnapshot userDoc = await FirebaseFirestore.instance
           .collection('users')
           .doc(currentUserId)
           .get();
-      
-      setState(() {
-        currentUserTokenBalance = (userDoc.data() as Map<String, dynamic>)['tokenBalance'] ?? 0.0;
-      });
+
+      if (userDoc.exists) {
+        setState(() {
+          // Assuming token balance is stored directly in the user document
+          currentUserTokenBalance = (userDoc.data() as Map<String, dynamic>)['tokenBalance'] ?? 0.0;
+        });
+      }
     } catch (e) {
       print('Error fetching token balance: $e');
     }
@@ -163,7 +166,7 @@ class _SendTokenPageState extends State<SendTokenPage> {
                         token: selectedToken,
                         amount: tokenAmount,
                         recipientId: toAddress,
-                        memo: toAddress,
+                        memo: memo,
                         timestamp: DateTime.now(),
                         currency: 'IDR',
                         price: 0.0,
@@ -195,8 +198,6 @@ class _SendTokenPageState extends State<SendTokenPage> {
 
   Future<void> _updateTokenBalances() async {
     try {
-      String currentUserId = getCurrentUserId();
-      
       FirebaseFirestore firestore = FirebaseFirestore.instance;
 
       await firestore.runTransaction((transaction) async {
@@ -206,6 +207,7 @@ class _SendTokenPageState extends State<SendTokenPage> {
         DocumentSnapshot senderSnapshot = await transaction.get(senderRef);
         DocumentSnapshot recipientSnapshot = await transaction.get(recipientRef);
 
+        // Assuming tokenBalance is a top-level field; adjust if it's nested in a subcollection
         double senderNewBalance = (senderSnapshot.data() as Map<String, dynamic>)['tokenBalance'] - tokenAmount;
         double recipientNewBalance = (recipientSnapshot.data() as Map<String, dynamic>)['tokenBalance'] + tokenAmount;
 
@@ -232,6 +234,8 @@ class _SendTokenPageState extends State<SendTokenPage> {
             toAddress = value;
           } else if (label == 'Amount') {
             tokenAmount = (double.tryParse(value) ?? 0.0);
+          } else if (label == 'Memo') {
+            memo = value;
           }
         });
       },

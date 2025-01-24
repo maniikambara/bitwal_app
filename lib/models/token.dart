@@ -13,6 +13,7 @@ class Token {
     required this.amount,
   });
 
+  // Convert Token object to Map for saving to Firestore
   Map<String, dynamic> toMap() {
     return {
       'name': name,
@@ -23,15 +24,17 @@ class Token {
     };
   }
 
+  // Convert Map to Token object
   factory Token.fromMap(Map<String, dynamic> map) {
     return Token(
       name: map['name'] ?? '',
       abbreviation: map['abbreviation'] ?? '',
-      price: (map['price'] ?? 0.0).toDouble(),
+      price: (map['price'] as num?)?.toDouble() ?? 0.0,
       icon: map['icon'] ?? '',
-      amount: (map['amount'] ?? 0.0).toDouble(),
+      amount: (map['amount'] as num?)?.toDouble() ?? 0.0,
     );
   }
 
-  get symbol => null;
+  // Getter to return abbreviation as the symbol of the token
+  String get symbol => abbreviation;
 }

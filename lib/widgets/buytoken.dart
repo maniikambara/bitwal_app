@@ -17,17 +17,45 @@ class BuyToken extends StatefulWidget {
 }
 
 class _BuyTokenState extends State<BuyToken> {
-  String selectedCurrency = 'IDR';
+  String selectedCurrency = ''; // Set default currency to the token abbreviation
   int amount = 0;
   final currencyFormat = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
+  Token? selectedToken;
 
   @override
   void initState() {
     super.initState();
-    selectedCurrency = 'IDR';
+    selectedCurrency = widget.tokenAbbr; // Set the default currency to the token's abbreviation
+    _loadToken();
   }
 
-  Future<void> _purchaseToken(Token token) async {
+  // Fetch token details from Firestore
+  Future<void> _loadToken() async {
+    try {
+      final tokenDoc = await FirebaseFirestore.instance
+          .collection('tokens')
+          .doc(widget.tokenAbbr)
+          .get();
+
+      if (tokenDoc.exists) {
+        setState(() {
+          selectedToken = Token.fromMap(tokenDoc.data() as Map<String, dynamic>);
+        });
+      }
+    } catch (e) {
+      print("Error fetching token details: $e");
+    }
+  }
+
+  // Purchase token and update user balance and tokens
+  Future<void> _purchaseToken() async {
+    if (selectedToken == null || amount <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Invalid purchase details')),
+      );
+      return;
+    }
+
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) {
@@ -37,9 +65,10 @@ class _BuyTokenState extends State<BuyToken> {
         return;
       }
 
-      final totalCost = amount.toDouble();
-      final tokenAmount = (amount / token.price).floor();
+      final totalCost = amount * selectedToken!.price;
+      final tokenAmount = (amount / selectedToken!.price).floor();
 
+      // Run Firestore transaction to ensure atomicity
       await FirebaseFirestore.instance.runTransaction((transaction) async {
         final userRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
         final userDoc = await transaction.get(userRef);
@@ -51,22 +80,25 @@ class _BuyTokenState extends State<BuyToken> {
           throw 'Insufficient balance';
         }
 
+        // Update the user's token balance
         Map<String, dynamic> updatedTokens = Map.from(currentTokens);
-        updatedTokens[token.abbreviation] = 
-          (updatedTokens[token.abbreviation] ?? 0) + tokenAmount;
+        updatedTokens[selectedToken!.abbreviation] = 
+          (updatedTokens[selectedToken!.abbreviation] ?? 0) + tokenAmount;
 
         final newBalance = currentBalance - totalCost;
 
+        // Update Firestore with new token balances and user balance
         transaction.update(userRef, {
-          'tokens': updatedTokens,
-          'balance': newBalance,
+          'tokens': updatedTokens,  // Update tokens map
+          'balance': newBalance,  // Update balance
         });
 
+        // Record the transaction in Firestore
         final transactionRef = FirebaseFirestore.instance.collection('transactions').doc();
         transaction.set(transactionRef, {
           'userId': user.uid,
           'type': 'token_purchase',
-          'token': token.abbreviation,
+          'token': selectedToken!.abbreviation,
           'amount': tokenAmount,
           'totalCost': totalCost,
           'timestamp': FieldValue.serverTimestamp(),
@@ -74,18 +106,19 @@ class _BuyTokenState extends State<BuyToken> {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Purchased $tokenAmount ${token.abbreviation}')),
+        SnackBar(content: Text('Purchased $tokenAmount ${selectedToken!.abbreviation}')),
       );
 
+      // Navigate to the order page after purchase
       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => OrderPage(
             type: 'Buy',
-            token: token.abbreviation,
+            token: selectedToken!.abbreviation,
             amount: tokenAmount.toDouble(),
             currency: selectedCurrency,
-            price: token.price,
+            price: selectedToken!.price,
             recipientId: '',
             memo: '',
             timestamp: DateTime.now(),
@@ -100,6 +133,7 @@ class _BuyTokenState extends State<BuyToken> {
     }
   }
 
+  // Update the amount based on user input
   void _updateAmount(String text) {
     setState(() {
       if (text == 'C') {
@@ -131,23 +165,7 @@ class _BuyTokenState extends State<BuyToken> {
               return Center(child: Text('User Error: ${userSnapshot.error}'));
             }
 
-            final tokens = tokenSnapshot.data ?? [];
-            final token = tokens.firstWhere(
-              (t) => t.abbreviation == widget.tokenAbbr,
-              orElse: () => Token(
-                name: '',
-                abbreviation: widget.tokenAbbr,
-                price: 0,
-                icon: '',
-                amount: 0,
-              ),
-            );
-
-            final currencyItems = {'IDR', widget.tokenAbbr}.toList();
-
-            if (!currencyItems.contains(selectedCurrency)) {
-              selectedCurrency = 'IDR';
-            }
+            final token = selectedToken;
 
             return Scaffold(
               backgroundColor: const Color(0xFF222831),
@@ -163,7 +181,7 @@ class _BuyTokenState extends State<BuyToken> {
                   children: [
                     const SizedBox(height: 10),
                     Text(
-                      'BUY ${token.abbreviation}',
+                      'BUY ${token?.abbreviation ?? ''}',
                       style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
                     ),
                     Container(
@@ -178,7 +196,7 @@ class _BuyTokenState extends State<BuyToken> {
                           });
                         },
                         dropdownColor: const Color(0xFF393E46),
-                        items: currencyItems.map<DropdownMenuItem<String>>((String value) {
+                        items: {'IDR', token?.abbreviation ?? 'IDR'}.map<DropdownMenuItem<String>>((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
                             child: Row(
@@ -232,9 +250,9 @@ class _BuyTokenState extends State<BuyToken> {
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      selectedCurrency == widget.tokenAbbr
-                          ? '≈ ${currencyFormat.format(amount * token.price)}'
-                          : '≈ ${(amount / token.price).floor()} ${token.abbreviation}',
+                      selectedCurrency == token?.abbreviation
+                          ? '≈ ${currencyFormat.format(amount * token!.price)}'
+                          : '≈ ${(amount / token!.price).floor()} ${token.abbreviation}',
                       style: const TextStyle(color: Colors.grey),
                     ),
                     const SizedBox(height: 32),
@@ -263,7 +281,7 @@ class _BuyTokenState extends State<BuyToken> {
                     const SizedBox(height: 32),
                     ElevatedButton(
                       onPressed: amount > 0 
-                        ? () => _purchaseToken(token)
+                        ? _purchaseToken
                         : null,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFD65A31),

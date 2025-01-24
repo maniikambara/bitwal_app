@@ -194,7 +194,7 @@ class StakingPage extends StatelessWidget {
             ),
             child: const Center(
               child: Text(
-                'Staking sekarang',
+                'Stake Now',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 18,

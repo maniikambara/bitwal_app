@@ -248,7 +248,10 @@ class TokenDetails extends StatelessWidget {
                       backgroundColor: Colors.green,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
-                    child: const Text('Buy'),
+                    child: const Text(
+                      'Buy',
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -264,7 +267,10 @@ class TokenDetails extends StatelessWidget {
                       backgroundColor: Colors.red,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
-                    child: const Text('Sell'),
+                    child: const Text(
+                      'Sell',
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
                   ),
                 ),
               ],

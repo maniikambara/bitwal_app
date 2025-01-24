@@ -49,7 +49,7 @@ class ProfileSettingsPage extends StatelessWidget {
               onPressed: () => Navigator.pop(context),
             ),
             title: const Text(
-              'My wallet',
+              'My Wallet',
               style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
@@ -64,7 +64,7 @@ class ProfileSettingsPage extends StatelessWidget {
                       const SizedBox(height: 16),
                       _buildSettingsTile(
                         context,
-                        'Wallet name',
+                        'Wallet Name',
                         user.username,
                         onTap: () => _showEditDialog(context, 'Wallet Name', user),
                       ),
@@ -76,13 +76,13 @@ class ProfileSettingsPage extends StatelessWidget {
                       ),
                       _buildSettingsTile(
                         context,
-                        'Private key',
+                        'Private Key',
                         '',
                         onTap: () => _showPrivateKeyDialog(context, user.uid),
                       ),
                       _buildSettingsTile(
                         context,
-                        'Back up Mnemonics',
+                        'Backup Mnemonics',
                         '',
                         onTap: () => _showMnemonicsDialog(context),
                       ),
@@ -438,6 +438,73 @@ class ProfileSettingsPage extends StatelessWidget {
   }
 
   void _showMnemonicsDialog(BuildContext context) {
-    // Implement backup mnemonics functionality
+    // For demonstration, we are assuming the mnemonics are stored in a string.
+    // In a real-world scenario, you would fetch the actual mnemonics securely from the user's data.
+    String mnemonics = "example mnemonics phrase here";  // Replace with actual logic to fetch mnemonics
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF393E46),
+          title: const Text(
+            'Backup Mnemonics',
+            style: TextStyle(color: Colors.white),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Your recovery phrase (Keep this safe):',
+                style: TextStyle(color: Colors.white70),
+              ),
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF222831),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        mnemonics,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontFamily: 'monospace',
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.copy, color: Colors.white),
+                      onPressed: () {
+                        Clipboard.setData(ClipboardData(text: mnemonics));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Copied to clipboard')),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Make sure to store your recovery phrase securely. You will need it to recover your wallet if necessary.',
+                style: TextStyle(color: Colors.white70, fontSize: 14),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Close', style: TextStyle(color: Colors.orange)),
+            ),
+          ],
+        );
+      },
+    );
   }
 }

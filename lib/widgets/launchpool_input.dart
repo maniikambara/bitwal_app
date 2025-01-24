@@ -66,17 +66,17 @@ class LaunchpoolStakingPage extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             const Text(
-              'Min. Jumlah Staking = 1 BTC',
+              'Min. Staking Amount = 1 BTC',
               style: TextStyle(color: Colors.white70, fontSize: 14),
             ),
             const SizedBox(height: 4),
             const Text(
-              'Tersedia: 1,000 BTC',
+              'Available: 1,000 BTC',
               style: TextStyle(color: Colors.white70, fontSize: 14),
             ),
             const SizedBox(height: 20),
             const Text(
-              'Detail Proyek',
+              'Project Details',
               style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
@@ -90,19 +90,19 @@ class LaunchpoolStakingPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Koin Staking: BTC',
+                    'Staking Coin: BTC',
                     style: TextStyle(color: Colors.white70, fontSize: 14),
                   ),
                   Text(
-                    'Total Hadiah: 1,212 BTC',
+                    'Total Reward: 1,212 BTC',
                     style: TextStyle(color: Colors.white70, fontSize: 14),
                   ),
                   Text(
-                    'Periode Farming: 10 Hari',
+                    'Farming Period: 10 Days',
                     style: TextStyle(color: Colors.white70, fontSize: 14),
                   ),
                   Text(
-                    'Berakhir dalam: 01 D 04 H 32 M 12 S',
+                    'Ends in: 01 D 04 H 32 M 12 S',
                     style: TextStyle(color: Colors.white70, fontSize: 14),
                   ),
                   Text(
@@ -121,7 +121,7 @@ class LaunchpoolStakingPage extends StatelessWidget {
                 style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
               ),
               subtitle: const Text(
-                'Total staking saya',
+                'My total staking',
                 style: TextStyle(color: Colors.white70, fontSize: 14),
               ),
             ),
@@ -133,7 +133,7 @@ class LaunchpoolStakingPage extends StatelessWidget {
                 style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
               ),
               subtitle: const Text(
-                'Total hadiah',
+                'Total reward',
                 style: TextStyle(color: Colors.white70, fontSize: 14),
               ),
             ),
@@ -154,7 +154,7 @@ class LaunchpoolStakingPage extends StatelessWidget {
                 ),
               ),
               child: const Text(
-                'LANJUT',
+                'CONTINUE',
                 style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ),

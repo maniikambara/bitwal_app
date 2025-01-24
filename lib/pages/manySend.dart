@@ -1,5 +1,6 @@
 import 'package:bitwal_app/pages/manyReceive.dart';
 import 'package:bitwal_app/pages/oneReceive.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class ManySend extends StatefulWidget {
@@ -11,7 +12,56 @@ class ManySend extends StatefulWidget {
 }
 
 class _ManySendState extends State<ManySend> {
-  List<bool> isChecked = List.filled(3, false);
+  List<bool> isChecked = [];
+  List<Map<String, dynamic>> users = []; // To store the list of users
+  List<Map<String, dynamic>> filteredUsers = []; // To store filtered users
+  String searchQuery = ''; // Search query for filtering
+  bool isLoading = true; // Loading state for Firestore data
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUsers(); // Fetch users when the page is initialized
+  }
+
+  // Fetch list of users from Firestore
+  Future<void> _fetchUsers() async {
+    try {
+      final snapshot = await FirebaseFirestore.instance.collection('users').get();
+      final usersData = snapshot.docs
+          .map((doc) {
+        return {
+          'uid': doc.id,
+          'username': doc['username'] ?? 'Unknown', // Only fetch the username
+          'avatar': 'lib/images/Logo.png', // Default avatar
+        };
+      }).toList();
+
+      setState(() {
+        users = usersData;
+        filteredUsers = usersData; // Initially, no filtering, show all users
+        isChecked = List.generate(usersData.length, (_) => false); // Initialize checkbox state
+        isLoading = false; // Set loading state to false after fetching
+      });
+    } catch (e) {
+      print("Error fetching users: $e");
+      setState(() {
+        isLoading = false; // Stop loading if an error occurs
+      });
+    }
+  }
+
+  // Filter users based on the search query
+  void _filterUsers(String query) {
+    setState(() {
+      searchQuery = query;
+      filteredUsers = users.where((user) {
+        return user['username']!.toLowerCase().contains(query.toLowerCase());
+      }).toList();
+    });
+  }
+
+  // Check if at least 2 users are selected
   bool get isEnoughChecked => isChecked.where((element) => element).length >= 2;
 
   @override
@@ -39,8 +89,10 @@ class _ManySendState extends State<ManySend> {
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: Column(
           children: [
-            const SizedBox(height: 40),
+            const SizedBox(height: 20),
+            // Search TextField
             TextField(
+              onChanged: _filterUsers, // Call filter function on change
               decoration: InputDecoration(
                 filled: true,
                 fillColor: const Color(0xFFD9D9D9),
@@ -69,41 +121,49 @@ class _ManySendState extends State<ManySend> {
               ),
             ),
             const SizedBox(height: 20),
-            Expanded(
-              child: ListView.builder(
-                itemCount: 3,
-                itemBuilder: (context, index) => Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10.0),
-                  child: Row(
-                    children: [
-                      const CircleAvatar(
-                        backgroundImage: AssetImage('lib/images/Logo.png'),
-                        radius: 20,
-                      ),
-                      const SizedBox(width: 16),
-                      const Text(
-                        "TrizzKunn",
-                        style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      const Spacer(),
-                      Checkbox(
-                        value: isChecked[index],
-                        onChanged: (value) {
-                          setState(() {
-                            isChecked[index] = value!;
-                          });
-                        },
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(5),
+            // Display loading state or user list
+            isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : Expanded(
+                    child: ListView.builder(
+                      itemCount: filteredUsers.length,
+                      itemBuilder: (context, index) => Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10.0),
+                        child: Row(
+                          children: [
+                            // Display the avatar or placeholder image
+                            CircleAvatar(
+                              backgroundImage: AssetImage(filteredUsers[index]['avatar']),
+                              radius: 20,
+                            ),
+                            const SizedBox(width: 16),
+                            Text(
+                              filteredUsers[index]['username'],
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const Spacer(),
+                            Checkbox(
+                              value: isChecked[index],
+                              onChanged: (value) {
+                                setState(() {
+                                  isChecked[index] = value!;
+                                });
+                              },
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              activeColor: const Color(0xFFD65A31),
+                              checkColor: Colors.white,
+                            ),
+                          ],
                         ),
-                        activeColor: const Color(0xFFD65A31),
-                        checkColor: Colors.white,
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
-            ),
             ElevatedButton(
               onPressed: isEnoughChecked
                   ? () {

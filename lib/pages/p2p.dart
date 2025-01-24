@@ -2,6 +2,7 @@ import 'package:bitwal_app/pages/more.dart';
 import 'package:bitwal_app/pages/notif.dart';
 import 'package:bitwal_app/widgets/p2pdetail.dart';
 import 'package:flutter/material.dart';
+import 'dart:math';
 
 class P2PTradingPage extends StatefulWidget {
   const P2PTradingPage({super.key});
@@ -12,6 +13,20 @@ class P2PTradingPage extends StatefulWidget {
 
 class _P2PTradingPageState extends State<P2PTradingPage> {
   bool isBuySelected = true;
+
+  // Generate random amount and limit for transactions
+  String getRandomAmount() {
+    final random = Random();
+    double amount = random.nextDouble() * 1000; // Random amount between 0 and 1000
+    return amount.toStringAsFixed(2);
+  }
+
+  String getRandomLimit() {
+    final random = Random();
+    double minLimit = random.nextDouble() * 500; // Random minimum limit between 0 and 500
+    double maxLimit = minLimit + (random.nextDouble() * 500); // Random maximum limit
+    return 'Rp ${minLimit.toStringAsFixed(2)} - Rp ${maxLimit.toStringAsFixed(2)}';
+  }
 
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
@@ -40,67 +55,55 @@ class _P2PTradingPageState extends State<P2PTradingPage> {
   }
 
   Widget _buildToggleButtons() {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFF4E5967),
-        borderRadius: BorderRadius.circular(8),
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Center(
+        child: Container(
+          decoration: BoxDecoration(
+            color: const Color(0xFF222831),
+            borderRadius: BorderRadius.circular(40),
+          ),
+          child: Row(
+            children: [
+              _buildTab("Buy", left: true),
+              _buildTab("Sell", right: true),
+            ],
+          ),
+        ),
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: GestureDetector(
-              onTap: () => setState(() => isBuySelected = true),
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                decoration: BoxDecoration(
-                  color: isBuySelected ? Colors.orange : Colors.transparent,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(8),
-                    bottomLeft: Radius.circular(8),
-                  ),
-                ),
-                child: Text(
-                  'Buy',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: isBuySelected ? Colors.white : Colors.white70,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-              ),
+    );
+  }
+
+  Widget _buildTab(String text, {bool left = true, bool right = true}) {
+    final isSelected = (text == "Buy" && isBuySelected) || (text == "Sell" && !isBuySelected);
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            isBuySelected = (text == "Buy");
+          });
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          margin: const EdgeInsets.all(8.0),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: isSelected ? const Color(0xFF393E46) : const Color(0xFF222831),
+            borderRadius: BorderRadius.horizontal(
+              left: left ? const Radius.circular(40) : Radius.zero,
+              right: right ? const Radius.circular(40) : Radius.zero,
             ),
           ),
-          Expanded(
-            child: GestureDetector(
-              onTap: () => setState(() => isBuySelected = false),
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                decoration: BoxDecoration(
-                  color: !isBuySelected ? Colors.orange : Colors.transparent,
-                  borderRadius: const BorderRadius.only(
-                    topRight: Radius.circular(8),
-                    bottomRight: Radius.circular(8),
-                  ),
-                ),
-                child: Text(
-                  'Sell',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: !isBuySelected ? Colors.white : Colors.white70,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
+          child: Text(text, style: const TextStyle(color: Colors.white)),
+        ),
       ),
     );
   }
 
   Widget _buildTransactionItem(BuildContext context) {
+    String randomAmount = getRandomAmount();
+    String randomLimit = getRandomLimit();
+
     return GestureDetector(
       onTap: () => Navigator.push(
         context,
@@ -119,29 +122,29 @@ class _P2PTradingPageState extends State<P2PTradingPage> {
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
+                children: [
                   Text(
                     'Adit CUCI MOTOR',
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 6),
+                  const SizedBox(height: 6),
                   Text(
-                    'Rp 0.00',
-                    style: TextStyle(color: Colors.white, fontSize: 13),
+                    'Rp $randomAmount',
+                    style: const TextStyle(color: Colors.white, fontSize: 13),
                   ),
                   Text(
-                    'Amount: 0.00 USDT',
-                    style: TextStyle(color: Colors.white70, fontSize: 11),
+                    'Amount: $randomAmount USDT',
+                    style: const TextStyle(color: Colors.white70, fontSize: 11),
                   ),
                   Text(
-                    'Limit: Rp 0.00 - 0.00',
-                    style: TextStyle(color: Colors.white70, fontSize: 11),
+                    'Limit: $randomLimit',
+                    style: const TextStyle(color: Colors.white70, fontSize: 11),
                   ),
-                  Text(
+                  const Text(
                     'Bank Transfer (Sigma, Wing Money, True Money)',
                     style: TextStyle(color: Colors.white70, fontSize: 11),
                   ),

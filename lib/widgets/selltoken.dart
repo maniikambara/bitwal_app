@@ -1,5 +1,9 @@
 import 'package:bitwal_app/widgets/order.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:bitwal_app/models/token.dart';
+import 'package:intl/intl.dart';
 
 class SellToken extends StatefulWidget {
   const SellToken({super.key, required this.name, required String tokenAbbr});
@@ -10,8 +14,114 @@ class SellToken extends StatefulWidget {
 }
 
 class _SellTokenState extends State<SellToken> {
-  String selectedCurrency = 'IDR';
+  String selectedCurrency = ''; 
   int amount = 0;
+  Token? selectedToken;
+  final currencyFormat = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
+
+  @override
+  void initState() {
+    super.initState();
+    selectedCurrency = widget.name;
+    _loadToken();
+  }
+
+  Future<void> _loadToken() async {
+    try {
+      final tokenDoc = await FirebaseFirestore.instance
+          .collection('tokens')
+          .doc(widget.name)
+          .get();
+
+      if (tokenDoc.exists) {
+        setState(() {
+          selectedToken = Token.fromMap(tokenDoc.data() as Map<String, dynamic>);
+        });
+      }
+    } catch (e) {
+      print("Error fetching token details: $e");
+    }
+  }
+
+  Future<void> _sellToken() async {
+    if (selectedToken == null || amount <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Invalid sell details')),
+      );
+      return;
+    }
+
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please log in to sell tokens')),
+        );
+        return;
+      }
+
+      final totalCost = amount * selectedToken!.price;
+      final tokenAmount = (amount / selectedToken!.price).floor();
+
+      await FirebaseFirestore.instance.runTransaction((transaction) async {
+        final userRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
+        final userDoc = await transaction.get(userRef);
+
+        final currentBalance = (userDoc.data()?['balance'] ?? 0.0) as double;
+        final currentTokens = (userDoc.data()?['tokens'] ?? {}) as Map<String, dynamic>;
+
+        if ((currentTokens[selectedToken!.abbreviation] ?? 0) < tokenAmount) {
+          throw 'Insufficient tokens to sell';
+        }
+
+        Map<String, dynamic> updatedTokens = Map.from(currentTokens);
+        updatedTokens[selectedToken!.abbreviation] =
+            (updatedTokens[selectedToken!.abbreviation] ?? 0) - tokenAmount;
+
+        final newBalance = currentBalance + totalCost;
+
+        transaction.update(userRef, {
+          'tokens': updatedTokens,
+          'balance': newBalance,
+        });
+
+        final transactionRef = FirebaseFirestore.instance.collection('transactions').doc();
+        transaction.set(transactionRef, {
+          'userId': user.uid,
+          'type': 'token_sale',
+          'token': selectedToken!.abbreviation,
+          'amount': tokenAmount,
+          'totalCost': totalCost,
+          'timestamp': FieldValue.serverTimestamp(),
+        });
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Sold $tokenAmount ${selectedToken!.abbreviation}')),
+      );
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => OrderPage(
+            type: 'Sell',
+            token: selectedToken!.abbreviation,
+            amount: tokenAmount.toDouble(),
+            currency: selectedCurrency,
+            price: selectedToken!.price,
+            recipientId: '',
+            memo: '',
+            timestamp: DateTime.now(),
+          ),
+        ),
+      );
+    } catch (e) {
+      print('Token sale error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Sale failed: $e')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +140,7 @@ class _SellTokenState extends State<SellToken> {
             const SizedBox(height: 10),
             Text(
               'SELL ${widget.name}',
-              style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold ),
+              style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
             ),
             Container(
               decoration: BoxDecoration(
@@ -44,7 +154,7 @@ class _SellTokenState extends State<SellToken> {
                   });
                 },
                 dropdownColor: const Color(0xFF393E46),
-                items: <String>['IDR', 'BTC'].map<DropdownMenuItem<String>>((String value) {
+                items: <String>['IDR', widget.name].map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
                     child: Row(
@@ -98,9 +208,11 @@ class _SellTokenState extends State<SellToken> {
             ),
             const SizedBox(height: 10),
             Text(
-              selectedCurrency == 'BTC'
-                  ? '${(amount * 98765421).toStringAsFixed(0)} IDR'
-                  : '${(amount / 98765421).toStringAsFixed(8)} BTC',
+              selectedToken != null
+                  ? (selectedCurrency == widget.name
+                      ? '${(amount * selectedToken!.price).toStringAsFixed(0)} IDR'
+                      : '${(amount / selectedToken!.price).toStringAsFixed(8)} ${selectedToken!.abbreviation}')
+                  : 'Loading...',
               style: const TextStyle(color: Colors.grey, fontSize: 16),
             ),
             const SizedBox(height: 20),
@@ -138,14 +250,7 @@ class _SellTokenState extends State<SellToken> {
               ),
             ),
             ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => OrderPage(type: '', token: '', amount: 0, currency: '', price: 0, recipientId: '', memo: '', timestamp: DateTime.now(),)
-                  ),
-                );
-              },
+              onPressed: _sellToken,
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFD65A31),
                 padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 100),

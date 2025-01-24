@@ -18,7 +18,7 @@ class AuthService extends ChangeNotifier {
       try {
         final doc = await _firestore.collection('users').doc(user.uid).get();
         final data = doc.data() ?? {};
-        
+
         // Ensure tokens is a list
         List<Token> tokens = [];
         if (data.containsKey('tokens') && data['tokens'] is List) {
@@ -55,7 +55,7 @@ class AuthService extends ChangeNotifier {
           abbreviation: data['abbreviation'] as String,
           price: (data['price'] as num).toDouble(),
           icon: data['icon'] as String,
-          amount: 0.0,
+          amount: 0.0, // Default amount for available tokens
         );
       }).toList();
     });
@@ -72,9 +72,9 @@ class AuthService extends ChangeNotifier {
       if (!btcDoc.exists) {
         throw Exception('BTC token not found in database');
       }
-      
+
       final btcData = btcDoc.data()!;
-      
+
       final btcToken = Token(
         name: btcData['name'] as String,
         abbreviation: btcData['abbreviation'] as String,
@@ -93,7 +93,7 @@ class AuthService extends ChangeNotifier {
       await _firestore
           .collection('users')
           .doc(userCredential.user!.uid)
-          .set(userData.toMap());
+          .set(userData.toMap()); // Save user data with tokens
 
       return userCredential;
     } catch (e) {
@@ -125,7 +125,7 @@ class AuthService extends ChangeNotifier {
             .doc(currentUser!.uid)
             .get();
         final data = doc.data() as Map<String, dynamic>;
-        
+
         // Ensure tokens is a list
         List<Token> tokens = [];
         if (data.containsKey('tokens') && data['tokens'] is List) {
@@ -168,9 +168,9 @@ class AuthService extends ChangeNotifier {
     if (currentUser != null) {
       final userData = await getUserData();
       if (userData != null) {
-        final existingTokens = userData.tokens;
+        final existingTokens = List<Token>.from(userData.tokens);
         existingTokens.add(token);
-        
+
         await _firestore
             .collection('users')
             .doc(currentUser!.uid)
@@ -187,10 +187,17 @@ class AuthService extends ChangeNotifier {
       final userData = await getUserData();
       if (userData != null) {
         final tokens = userData.tokens;
-        final tokenIndex = tokens.indexWhere((t) => t.symbol == symbol);
-        
+        final tokenIndex = tokens.indexWhere((t) => t.abbreviation == symbol);
+
         if (tokenIndex != -1) {
-          tokens[tokenIndex] = Token(amount: newAmount, name: '', abbreviation: '', price: 0.0, icon: '');
+          tokens[tokenIndex] = Token(
+            name: tokens[tokenIndex].name,
+            abbreviation: tokens[tokenIndex].abbreviation,
+            price: tokens[tokenIndex].price,
+            icon: tokens[tokenIndex].icon,
+            amount: newAmount,
+          );
+
           await _firestore
               .collection('users')
               .doc(currentUser!.uid)
