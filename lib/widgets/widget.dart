@@ -105,7 +105,7 @@ class NewsCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(author, style: TextStyle(color: Colors.white.withOpacity(1), fontSize: 14)),
+              Text(author, style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 14)),
               const SizedBox(height: 8),
               Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
               const SizedBox(height: 8),

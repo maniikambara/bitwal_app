@@ -1,0 +1,2 @@
+C:/Users/manii/Documents/vscode/flutter_project/bitwal_app/android/app/.cxx/Debug/5j5ck5a6/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/manii/Documents/vscode/flutter_project/bitwal_app/android/app/.cxx/Debug/5j5ck5a6/armeabi-v7a/CMakeFiles/rebuild_cache.dir

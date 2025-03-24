@@ -60,10 +60,10 @@ class _HomeState extends State<Home> {
           newsArticles = List<Map<String, String>>.from(
             data['articles'].map<Map<String, String>>((article) {
               return {
-                'author': article['author'] ?? 'Unknown',
-                'title': article['title'] ?? 'No title',
-                'content': article['content'] ?? 'No content available',
-                'url': article['url'] ?? '',
+                'author': (article['author'] ?? 'Unknown').toString(),
+                'title': (article['title'] ?? 'No title').toString(),
+                'content': (article['content'] ?? 'No content available').toString(),
+                'url': (article['url'] ?? '').toString(),
               };
             }).toList(),
           );

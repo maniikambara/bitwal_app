@@ -55,7 +55,7 @@ class CreateWalletPage extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF393E46),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.orange.withOpacity(0.5), width: 1),
+        border: Border.all(color: Colors.orange.withValues(alpha: 0.5), width: 1),
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
